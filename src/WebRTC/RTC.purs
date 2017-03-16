@@ -25,6 +25,7 @@ module WebRTC.RTC (
 ) where
 
 import WebRTC.MediaStream
+import Control.Alt (alt)
 import Control.Monad.Aff (Aff, makeAff)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Exception (Error)
@@ -33,22 +34,31 @@ import Data.Argonaut.Core (stringify)
 import Data.Either (Either(..))
 import Data.Foreign (Foreign, toForeign)
 import Data.Foreign.Class (class AsForeign, write)
+import Data.Foreign.Null (writeNull)
+import Data.Foreign.NullOrUndefined (NullOrUndefined(..))
 import Data.Maybe (Maybe(..))
-import Data.Nullable (Nullable)
+import Data.Nullable (Nullable, toNullable)
 import Prelude (Unit, unit, (>>>), bind, ($), pure, (<$>))
 
 foreign import data RTCPeerConnection :: *
 
+-- https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer/url
 data ServerType
   = STUN { url :: String }
-  | TURN { url :: String, credential :: String, username :: String }
+  | TURN { url :: String, credentialType :: (Maybe String), credential :: (Maybe String), username :: (Maybe String) }
 
 
 type Ice = { iceServers :: Array ServerType }
 
 instance iceAsForeign :: AsForeign ServerType where
   write (STUN s) = toForeign s
-  write (TURN t) = toForeign t
+  write (TURN t) = toForeign {
+    url : t.url,
+    credentialType : toForeign $ toNullable (t.credentialType),
+    credential : toForeign $ toNullable t.credential,
+    username : toForeign $ toNullable t.username
+  }
+
 
 foreign import newRTCPeerConnection_
   :: forall e. { iceServers :: Array Foreign } -> Eff e RTCPeerConnection
