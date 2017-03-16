@@ -109,6 +109,7 @@ instance rtcSessionDescriptionDecodeJson :: DecodeJson RTCSessionDescription whe
     t <- getField obj "type"
     pure $ newRTCSessionDescription { "sdp" : sdp, "type" : t }
 
+
 foreign import newRTCSessionDescription
   :: { sdp :: String, "type" :: String } -> RTCSessionDescription
 

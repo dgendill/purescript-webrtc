@@ -1,6 +1,7 @@
 // module WebRTC.RTC
 
 exports.newRTCPeerConnection_ = function(ice) {
+    console.log(ice);
     return function() {
         return new (window.RTCPeerConnection || window.webkitRTCPeerConnection || window.mozRTCPeerConnection)(ice, {
             optional: [
@@ -19,7 +20,6 @@ exports.addStream = function(stream) {
 };
 
 exports.rtcSessionDescriptionToJson = function(rtcSessionDescription) {
-  console.log(rtcSessionDescription);
   return rtcSessionDescription.toJSON();
 }
 
