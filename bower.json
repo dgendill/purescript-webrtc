@@ -1,0 +1,24 @@
+{
+  "name": "purescript-webrtc",
+  "version": "0.0.0",
+  "authors": [
+    "Brian McKenna <brian@brianmckenna.org>"
+  ],
+  "description": "PureScript WebRTC bindings",
+  "keywords": [
+    "purescript",
+    "webrtc"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "output"
+  ],
+  "dependencies": {
+    "purescript-aff": "^1.0.0",
+    "purescript-unsafe-coerce": "^1.0.0",
+    "purescript-nullable": "^1.0.1"
+  }
+}
