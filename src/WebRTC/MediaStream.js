@@ -4,9 +4,9 @@ exports._getUserMedia = function(success) {
     return function(error) {
         return function(constraints) {
             return function() {
-                var getUserMedia = navigator.getUserMedia
-                    || navigator.webkitGetUserMedia
-                    || navigator.mozGetUserMedia;
+                // https://webrtc.org/web-apis/interop/
+                // https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
+                var getUserMedia = navigator.mediaDevices.getUserMedia;
 
                 return getUserMedia.call(
                     navigator,

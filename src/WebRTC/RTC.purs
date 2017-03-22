@@ -22,6 +22,8 @@ module WebRTC.RTC (
 , send
 , onmessageChannel
 , ondataChannel
+, audioVideoRTCOffer
+, noMediaRTCOffer
 ) where
 
 import WebRTC.MediaStream
@@ -50,7 +52,9 @@ data ServerType
   | TURN { urls :: NonEmpty Array String, credentialType :: Maybe String, credential :: Maybe String, username :: Maybe String }
 
 
-type Ice = { iceServers :: Array ServerType }
+type Ice = {
+  iceServers :: Array ServerType
+}
 
 instance serverTypeEncodeJson :: EncodeJson ServerType where
   encodeJson (STUN s) = jsonSingletonObject "urls" (encodeJson s.urls)
@@ -120,24 +124,25 @@ foreign import onaddstream
                RTCPeerConnection ->
                Eff e Unit
 
--- foreign import data RTCSessionDescription :: *
 type RTCSessionDescription = { sdp :: String, "type" :: String }
 
--- foreign import rtcSessionDescriptionToJson :: RTCSessionDescription -> JObject
+-- https://code.google.com/p/webrtc/issues/detail?id=3282
+-- https://bugzilla.mozilla.org/show_bug.cgi?id=1033833
+-- http://w3c.github.io/webrtc-pc/#idl-def-RTCOfferOptions
+type RTCOfferOptions = {
+  offerToReceiveAudio :: Boolean,
+  offerToReceiveVideo :: Boolean
+}
 
--- rtcSessionDescriptionToString :: RTCSessionDescription -> String
--- rtcSessionDescriptionToString = encodeJson >>> stringify
+audioVideoRTCOffer = {
+  offerToReceiveAudio: true,
+  offerToReceiveVideo: true
+}
 
--- instance rtcSessionDescriptionEncodeJson :: EncodeJson RTCSessionDescription where
---   encodeJson a = fromObject (rtcSessionDescriptionToJson a)
---
--- instance rtcSessionDescriptionDecodeJson :: DecodeJson RTCSessionDescription where
---   decodeJson json = do
---     obj <- decodeJson json
---     sdp <- getField obj "sdp"
---     t <- getField obj "type"
---     pure $ newRTCSessionDescription { "sdp" : sdp, "type" : t }
-
+noMediaRTCOffer = {
+  offerToReceiveAudio: false,
+  offerToReceiveVideo: false
+}
 
 foreign import newRTCSessionDescription
   :: { sdp :: String, "type" :: String } -> RTCSessionDescription
@@ -145,11 +150,13 @@ foreign import newRTCSessionDescription
 foreign import _createOffer
   :: forall e. (RTCSessionDescription -> Eff e Unit) ->
                (Error -> Eff e Unit) ->
+               RTCOfferOptions ->
                RTCPeerConnection ->
                Eff e Unit
 
-createOffer :: forall e. RTCPeerConnection -> Aff e RTCSessionDescription
-createOffer pc = makeAff (\e s -> _createOffer s e pc)
+
+createOffer :: forall e. RTCOfferOptions -> RTCPeerConnection -> Aff e RTCSessionDescription
+createOffer options pc = makeAff (\e s -> _createOffer s e options pc)
 
 foreign import _createAnswer
   :: forall e. (RTCSessionDescription -> Eff e Unit) ->
@@ -185,7 +192,7 @@ foreign import data RTCDataChannel :: *
 foreign import createDataChannel
   :: forall e. String ->
                RTCPeerConnection ->
-               Eff e RTCDataChannel
+               Aff e RTCDataChannel
 
 foreign import send
   :: forall e. String ->

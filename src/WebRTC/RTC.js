@@ -17,9 +17,7 @@ exports.addStream = function(stream) {
 exports.onicecandidate = function(f) {
     return function(pc) {
         return function() {
-            console.log('pc.onicecandidate');
             pc.onicecandidate = function(event) {
-                console.log(event);
                 f(event)();
             };
         };
@@ -38,20 +36,19 @@ exports.onaddstream = function(f) {
 
 exports._createOffer = function(success) {
     return function(error) {
-        return function(pc) {
-            return function() {
-                pc.createOffer({
-                  offerToReceiveAudio: 1,
-                  offerToReceiveVideo: 1
-                }).then(
-                    function(desc) {
-                        success(desc)();
-                    },
-                    function(e) {
-                        error(e)();
-                    }
-                );
-            };
+        return function(options) {
+          return function(pc) {
+              return function() {
+                  pc.createOffer(options).then(
+                      function(desc) {
+                          success(desc)();
+                      },
+                      function(e) {
+                          error(e)();
+                      }
+                  );
+              };
+          };
         };
     };
 };
@@ -131,18 +128,19 @@ exports.newRTCSessionDescription = function(s) {
 
 exports.createDataChannel = function(s) {
     return function(pc) {
-        return function() {
+        return function(success, error) {
             var dc = pc.createDataChannel(s);
             dc.onclose = function() {
-                console.log("CLOSED");
+                console.log("Data Channel '" + s + "' onclose");
             }
             dc.onerror = function(e) {
-                console.log("ERROR", e);
+                console.log("Data Channel '" + s + "' onerror", e);
+                error(e)();
             }
             dc.onopen = function() {
-                console.log("OPENED");
+                console.log("Data Channel '" + s + "' onopen");
+                success(dc);
             }
-            return dc;
         };
     };
 };
@@ -156,11 +154,11 @@ exports.send = function(s) {
     };
 };
 
+// https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/ondatachannel
 exports.ondataChannel = function(c) {
   return function(success, err) {
       c.ondatachannel = function(e) {
-        console.log('ondatachannel');
-        success(m)();
+        success(e.channel)();
       };
   }
 }
@@ -169,6 +167,7 @@ exports.onmessageChannel = function(f) {
     return function(dc) {
         return function() {
             dc.onmessage = function(m) {
+                console.log("onmessage", m);
                 f(m)();
             };
         };
