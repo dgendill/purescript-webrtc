@@ -21,15 +21,15 @@ module WebRTC.RTC (
 , createDataChannel
 , send
 , onmessageChannel
-, rtcSessionDescriptionToString
+, ondataChannel
 ) where
 
 import WebRTC.MediaStream
-import Control.Alt (alt)
+import Control.Alt (alt, (<|>))
 import Control.Monad.Aff (Aff, makeAff)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Exception (Error)
-import Data.Argonaut (class DecodeJson, class EncodeJson, JObject, decodeJson, encodeJson, fromObject, getField, toObject)
+import Data.Argonaut (class DecodeJson, class EncodeJson, JObject, Json, decodeJson, encodeJson, fromObject, getField, jsonEmptyObject, jsonSingletonObject, toObject, (:=), (~>))
 import Data.Argonaut.Core (stringify)
 import Data.Either (Either(..))
 import Data.Foreign (Foreign, toForeign)
@@ -37,34 +37,52 @@ import Data.Foreign.Class (class AsForeign, write)
 import Data.Foreign.Null (writeNull)
 import Data.Foreign.NullOrUndefined (NullOrUndefined(..))
 import Data.Maybe (Maybe(..))
+import Data.NonEmpty (NonEmpty(..))
 import Data.Nullable (Nullable, toNullable)
 import Prelude (Unit, unit, (>>>), bind, ($), pure, (<$>))
 
 foreign import data RTCPeerConnection :: *
 
 -- https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer/url
+
 data ServerType
-  = STUN { url :: String }
-  | TURN { url :: String, credentialType :: (Maybe String), credential :: (Maybe String), username :: (Maybe String) }
+  = STUN { urls :: NonEmpty Array String }
+  | TURN { urls :: NonEmpty Array String, credentialType :: Maybe String, credential :: Maybe String, username :: Maybe String }
 
 
 type Ice = { iceServers :: Array ServerType }
 
-instance iceAsForeign :: AsForeign ServerType where
-  write (STUN s) = toForeign s
-  write (TURN t) = toForeign {
-    url : t.url,
-    credentialType : toForeign $ toNullable (t.credentialType),
-    credential : toForeign $ toNullable t.credential,
-    username : toForeign $ toNullable t.username
-  }
+instance serverTypeEncodeJson :: EncodeJson ServerType where
+  encodeJson (STUN s) = jsonSingletonObject "urls" (encodeJson s.urls)
+  encodeJson (TURN t) = (
+    "urls" := t.urls
+    ~> "credentialType" := t.credentialType
+    ~> "credential" := t.credential
+    ~> "username" := t.username
+    ~> jsonEmptyObject
+  )
+
+instance serverTypeDecodeJson :: DecodeJson ServerType where
+  decodeJson json' = getTurn json' <|> getStun json'
+    where
+      getTurn json = do
+        obj <- decodeJson json
+        credentialType <- getField obj "credentialType"
+        credential <- getField obj "credential"
+        username <- getField obj "username"
+        urls <- getField obj "urls"
+        pure $ TURN { credentialType, credential, username, urls }
+      getStun json = do
+        obj <- decodeJson json
+        urls <- getField obj "urls"
+        pure $ STUN { urls }
 
 
 foreign import newRTCPeerConnection_
-  :: forall e. { iceServers :: Array Foreign } -> Eff e RTCPeerConnection
+  :: forall e. { iceServers :: Array Json } -> Eff e RTCPeerConnection
 
 newRTCPeerConnection :: forall e. Ice -> Eff e RTCPeerConnection
-newRTCPeerConnection i = newRTCPeerConnection_ { iceServers : (write <$> i.iceServers) }
+newRTCPeerConnection i = newRTCPeerConnection_ { iceServers : (encodeJson <$> i.iceServers) }
 
 foreign import addStream
   :: forall e. MediaStream -> RTCPeerConnection -> Eff e Unit
@@ -102,22 +120,23 @@ foreign import onaddstream
                RTCPeerConnection ->
                Eff e Unit
 
-foreign import data RTCSessionDescription :: *
+-- foreign import data RTCSessionDescription :: *
+type RTCSessionDescription = { sdp :: String, "type" :: String }
 
-foreign import rtcSessionDescriptionToJson :: RTCSessionDescription -> JObject
+-- foreign import rtcSessionDescriptionToJson :: RTCSessionDescription -> JObject
 
-rtcSessionDescriptionToString :: RTCSessionDescription -> String
-rtcSessionDescriptionToString = encodeJson >>> stringify
+-- rtcSessionDescriptionToString :: RTCSessionDescription -> String
+-- rtcSessionDescriptionToString = encodeJson >>> stringify
 
-instance rtcSessionDescriptionEncodeJson :: EncodeJson RTCSessionDescription where
-  encodeJson a = fromObject (rtcSessionDescriptionToJson a)
-
-instance rtcSessionDescriptionDecodeJson :: DecodeJson RTCSessionDescription where
-  decodeJson json = do
-    obj <- decodeJson json
-    sdp <- getField obj "sdp"
-    t <- getField obj "type"
-    pure $ newRTCSessionDescription { "sdp" : sdp, "type" : t }
+-- instance rtcSessionDescriptionEncodeJson :: EncodeJson RTCSessionDescription where
+--   encodeJson a = fromObject (rtcSessionDescriptionToJson a)
+--
+-- instance rtcSessionDescriptionDecodeJson :: DecodeJson RTCSessionDescription where
+--   decodeJson json = do
+--     obj <- decodeJson json
+--     sdp <- getField obj "sdp"
+--     t <- getField obj "type"
+--     pure $ newRTCSessionDescription { "sdp" : sdp, "type" : t }
 
 
 foreign import newRTCSessionDescription
@@ -177,3 +196,7 @@ foreign import onmessageChannel
   :: forall e. (String -> Eff e Unit) ->
                RTCDataChannel ->
                Eff e Unit
+
+foreign import ondataChannel
+  :: forall e. RTCPeerConnection ->
+               Aff e RTCDataChannel

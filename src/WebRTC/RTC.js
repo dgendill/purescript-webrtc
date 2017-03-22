@@ -1,13 +1,8 @@
 // module WebRTC.RTC
 
 exports.newRTCPeerConnection_ = function(ice) {
-    console.log(ice);
     return function() {
-        return new (window.RTCPeerConnection || window.webkitRTCPeerConnection || window.mozRTCPeerConnection)(ice, {
-            optional: [
-		            { DtlsSrtpKeyAgreement: true }
-	          ]
-        });
+        return new RTCPeerConnection(ice);
     };
 };
 
@@ -19,14 +14,12 @@ exports.addStream = function(stream) {
     };
 };
 
-exports.rtcSessionDescriptionToJson = function(rtcSessionDescription) {
-  return rtcSessionDescription.toJSON();
-}
-
 exports.onicecandidate = function(f) {
     return function(pc) {
         return function() {
+            console.log('pc.onicecandidate');
             pc.onicecandidate = function(event) {
+                console.log(event);
                 f(event)();
             };
         };
@@ -47,7 +40,10 @@ exports._createOffer = function(success) {
     return function(error) {
         return function(pc) {
             return function() {
-                pc.createOffer(
+                pc.createOffer({
+                  offerToReceiveAudio: 1,
+                  offerToReceiveVideo: 1
+                }).then(
                     function(desc) {
                         success(desc)();
                     },
@@ -64,7 +60,7 @@ exports._createAnswer = function(success) {
     return function(error) {
         return function(pc) {
             return function() {
-                pc.createAnswer(
+                pc.createAnswer().then(
                     function(desc) {
                         success(desc)();
                     },
@@ -137,6 +133,12 @@ exports.createDataChannel = function(s) {
     return function(pc) {
         return function() {
             var dc = pc.createDataChannel(s);
+            dc.onclose = function() {
+                console.log("CLOSED");
+            }
+            dc.onerror = function(e) {
+                console.log("ERROR", e);
+            }
             dc.onopen = function() {
                 console.log("OPENED");
             }
@@ -153,6 +155,15 @@ exports.send = function(s) {
         };
     };
 };
+
+exports.ondataChannel = function(c) {
+  return function(success, err) {
+      c.ondatachannel = function(e) {
+        console.log('ondatachannel');
+        success(m)();
+      };
+  }
+}
 
 exports.onmessageChannel = function(f) {
     return function(dc) {
