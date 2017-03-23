@@ -8,12 +8,12 @@ exports._getUserMedia = function(success) {
                 // https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
                 var getUserMedia = navigator.mediaDevices.getUserMedia;
 
-                return getUserMedia.call(
-                    navigator,
-                    constraints,
-                    function(r) { success(r)(); },
-                    function(e) { error(e)(); }
-                );
+                return getUserMedia(constraints).then(function(stream) {
+                  success(stream)();
+                }, function(e) {
+                  error(e)();
+                });
+              
             };
         };
     };

@@ -6,7 +6,7 @@
 data RTCPeerConnection :: Type
 ```
 
-Foreign data type for [RTCPeerConnection](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection)
+Foreign data type for [RTCPeerConnection](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection).
 
 #### `ServerType`
 
@@ -17,7 +17,7 @@ data ServerType
 ```
 
 Either a STUN or TURN Server.
-See [RTCIceServer](https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer)
+See [RTCIceServer](https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer).
 
 ##### Instances
 ``` purescript
@@ -39,13 +39,7 @@ An [RTCConfiguration](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerCo
 newRTCPeerConnection :: forall e. Ice -> Eff e RTCPeerConnection
 ```
 
-Creates a new [RTCPeerConnection](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection)
-
-#### `addStream`
-
-``` purescript
-addStream :: forall e. MediaStream -> RTCPeerConnection -> Eff e Unit
-```
+Creates a new [RTCPeerConnection](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection).
 
 #### `IceEvent`
 
@@ -53,7 +47,7 @@ addStream :: forall e. MediaStream -> RTCPeerConnection -> Eff e Unit
 data IceEvent :: Type
 ```
 
-Foreign type for [RTCPeerConnectionIceEvent](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnectionIceEvent)
+Foreign type for [RTCPeerConnectionIceEvent](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnectionIceEvent).
 
 #### `RTCIceCandidate`
 
@@ -61,7 +55,7 @@ Foreign type for [RTCPeerConnectionIceEvent](https://developer.mozilla.org/en-US
 type RTCIceCandidate = { sdpMLineIndex :: Nullable Int, sdpMid :: Nullable String, candidate :: String }
 ```
 
-Foreign type for [RTCIceCandidate](https://developer.mozilla.org/en-US/docs/Web/API/RTCIceCandidate)
+Foreign type for [RTCIceCandidate](https://developer.mozilla.org/en-US/docs/Web/API/RTCIceCandidate).
 
 #### `iceEventCandidate`
 
@@ -77,7 +71,7 @@ Attempts to get the RTCIceCandidate from an IceEvent.
 addIceCandidate :: forall e. RTCIceCandidate -> RTCPeerConnection -> Eff e Unit
 ```
 
-Add a candidate to a peer connection.  Corresponds to [addIceCandidate](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/addIceCandidate)
+Add a candidate to a peer connection.  Corresponds to [addIceCandidate](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/addIceCandidate).
 
 #### `onicecandidate`
 
@@ -86,18 +80,6 @@ onicecandidate :: forall e. (IceEvent -> Eff e Unit) -> RTCPeerConnection -> Eff
 ```
 
 Register an event listener when [onicecandidate](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/onicecandidate) is fired.
-
-#### `MediaStreamEvent`
-
-``` purescript
-type MediaStreamEvent = { stream :: MediaStream }
-```
-
-#### `onaddstream`
-
-``` purescript
-onaddstream :: forall e. (MediaStreamEvent -> Eff e Unit) -> RTCPeerConnection -> Eff e Unit
-```
 
 #### `RTCSessionDescription`
 
@@ -111,7 +93,7 @@ type RTCSessionDescription = { sdp :: String, "type" :: String }
 audioVideoRTCOffer :: RTCOfferOptions
 ```
 
-RTCOfferOptions with audio and video set to true
+RTCOfferOptions with audio and video set to true.
 
 #### `noMediaRTCOffer`
 
@@ -119,13 +101,15 @@ RTCOfferOptions with audio and video set to true
 noMediaRTCOffer :: RTCOfferOptions
 ```
 
-RTCOfferOptions with audio and video set to false
+RTCOfferOptions with audio and video set to false.
 
 #### `newRTCSessionDescription`
 
 ``` purescript
 newRTCSessionDescription :: { sdp :: String, "type" :: String } -> RTCSessionDescription
 ```
+
+Manually create a new [RTCSessionDescription](https://developer.mozilla.org/en-US/docs/Web/API/RTCSessionDescription).
 
 #### `createOffer`
 
@@ -141,7 +125,7 @@ Create an RTCSessionDescription offer.  See [createOffer](https://developer.mozi
 createAnswer :: forall e. RTCPeerConnection -> Aff e RTCSessionDescription
 ```
 
-Create an RTCSessionDescription answer.  See [createAnswer](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/createAnswer)
+Create an RTCSessionDescription answer.  See [createAnswer](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/createAnswer).
 
 #### `setLocalDescription`
 
