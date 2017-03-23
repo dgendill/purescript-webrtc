@@ -23,7 +23,6 @@ module WebRTC.RTC (
 , noMediaRTCOffer
 ) where
 
-import WebRTC.MediaStream
 import Control.Alt ((<|>))
 import Control.Monad.Aff (Aff, makeAff)
 import Control.Monad.Eff (Eff)
@@ -34,11 +33,11 @@ import Data.NonEmpty (NonEmpty)
 import Data.Nullable (Nullable)
 import Prelude (Unit, bind, pure, unit, ($), (<$>))
 
--- | Foreign data type for [RTCPeerConnection](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection)
+-- | Foreign data type for [RTCPeerConnection](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection).
 foreign import data RTCPeerConnection :: *
 
 -- | Either a STUN or TURN Server.
--- | See [RTCIceServer](https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer)
+-- | See [RTCIceServer](https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer).
 data ServerType
   = STUN { urls :: NonEmpty Array String }
   | TURN { urls :: NonEmpty Array String, credentialType :: Maybe String, credential :: Maybe String, username :: Maybe String }
@@ -78,14 +77,14 @@ instance serverTypeDecodeJson :: DecodeJson ServerType where
 foreign import newRTCPeerConnection_
   :: forall e. { iceServers :: Array Json } -> Eff e RTCPeerConnection
 
--- | Creates a new [RTCPeerConnection](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection)
+-- | Creates a new [RTCPeerConnection](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection).
 newRTCPeerConnection :: forall e. Ice -> Eff e RTCPeerConnection
 newRTCPeerConnection i = newRTCPeerConnection_ { iceServers : (encodeJson <$> i.iceServers) }
 
--- | Foreign type for [RTCPeerConnectionIceEvent](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnectionIceEvent)
+-- | Foreign type for [RTCPeerConnectionIceEvent](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnectionIceEvent).
 foreign import data IceEvent :: *
 
--- | Foreign type for [RTCIceCandidate](https://developer.mozilla.org/en-US/docs/Web/API/RTCIceCandidate)
+-- | Foreign type for [RTCIceCandidate](https://developer.mozilla.org/en-US/docs/Web/API/RTCIceCandidate).
 type RTCIceCandidate = { sdpMLineIndex :: Nullable Int
                        , sdpMid :: Nullable String
                        , candidate :: String
@@ -101,7 +100,7 @@ foreign import _iceEventCandidate
 iceEventCandidate :: IceEvent -> Maybe RTCIceCandidate
 iceEventCandidate = _iceEventCandidate Nothing Just
 
--- | Add a candidate to a peer connection.  Corresponds to [addIceCandidate](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/addIceCandidate)
+-- | Add a candidate to a peer connection.  Corresponds to [addIceCandidate](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/addIceCandidate).
 foreign import addIceCandidate
   :: forall e. RTCIceCandidate ->
                RTCPeerConnection ->
@@ -114,6 +113,7 @@ foreign import onicecandidate
                Eff e Unit
 
 
+-- A type for [RTCSessionDescription](https://developer.mozilla.org/en-US/docs/Web/API/RTCSessionDescription)
 type RTCSessionDescription = { sdp :: String, "type" :: String }
 
 -- https://code.google.com/p/webrtc/issues/detail?id=3282
@@ -126,20 +126,21 @@ type RTCOfferOptions = {
   offerToReceiveVideo :: Boolean
 }
 
--- | RTCOfferOptions with audio and video set to true
+-- | RTCOfferOptions with audio and video set to true.
 audioVideoRTCOffer :: RTCOfferOptions
 audioVideoRTCOffer = {
   offerToReceiveAudio: true,
   offerToReceiveVideo: true
 }
 
--- | RTCOfferOptions with audio and video set to false
+-- | RTCOfferOptions with audio and video set to false.
 noMediaRTCOffer :: RTCOfferOptions
 noMediaRTCOffer = {
   offerToReceiveAudio: false,
   offerToReceiveVideo: false
 }
 
+-- | Manually create a new [RTCSessionDescription](https://developer.mozilla.org/en-US/docs/Web/API/RTCSessionDescription).
 foreign import newRTCSessionDescription
   :: { sdp :: String, "type" :: String } -> RTCSessionDescription
 
@@ -160,7 +161,7 @@ foreign import _createAnswer
                RTCPeerConnection ->
                Eff e Unit
 
--- | Create an RTCSessionDescription answer.  See [createAnswer](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/createAnswer)
+-- | Create an RTCSessionDescription answer.  See [createAnswer](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/createAnswer).
 createAnswer :: forall e. RTCPeerConnection -> Aff e RTCSessionDescription
 createAnswer pc = makeAff (\e s -> _createAnswer s e pc)
 
