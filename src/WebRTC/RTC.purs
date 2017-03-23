@@ -27,26 +27,21 @@ module WebRTC.RTC (
 ) where
 
 import WebRTC.MediaStream
-import Control.Alt (alt, (<|>))
+import Control.Alt ((<|>))
 import Control.Monad.Aff (Aff, makeAff)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Exception (Error)
-import Data.Argonaut (class DecodeJson, class EncodeJson, JObject, Json, decodeJson, encodeJson, fromObject, getField, jsonEmptyObject, jsonSingletonObject, toObject, (:=), (~>))
-import Data.Argonaut.Core (stringify)
-import Data.Either (Either(..))
-import Data.Foreign (Foreign, toForeign)
-import Data.Foreign.Class (class AsForeign, write)
-import Data.Foreign.Null (writeNull)
-import Data.Foreign.NullOrUndefined (NullOrUndefined(..))
+import Data.Argonaut (class DecodeJson, class EncodeJson, Json, decodeJson, encodeJson, getField, jsonEmptyObject, jsonSingletonObject, (:=), (~>))
 import Data.Maybe (Maybe(..))
-import Data.NonEmpty (NonEmpty(..))
-import Data.Nullable (Nullable, toNullable)
-import Prelude (Unit, unit, (>>>), bind, ($), pure, (<$>))
+import Data.NonEmpty (NonEmpty)
+import Data.Nullable (Nullable)
+import Prelude (Unit, bind, pure, unit, ($), (<$>))
 
+-- | Foreign data type for [RTCPeerConnection](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection)
 foreign import data RTCPeerConnection :: *
 
--- https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer/url
-
+-- | Either a STUN or TURN Server.
+-- | See [RTCIceServer](https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer)
 data ServerType
   = STUN { urls :: NonEmpty Array String }
   | TURN { urls :: NonEmpty Array String, credentialType :: Maybe String, credential :: Maybe String, username :: Maybe String }
