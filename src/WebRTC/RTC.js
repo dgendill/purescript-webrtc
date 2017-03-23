@@ -6,14 +6,6 @@ exports.newRTCPeerConnection_ = function(ice) {
     };
 };
 
-exports.addStream = function(stream) {
-    return function(pc) {
-        return function() {
-            pc.addStream(stream);
-        };
-    };
-};
-
 exports.onicecandidate = function(f) {
     return function(pc) {
         return function() {

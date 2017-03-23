@@ -85,9 +85,6 @@ foreign import newRTCPeerConnection_
 newRTCPeerConnection :: forall e. Ice -> Eff e RTCPeerConnection
 newRTCPeerConnection i = newRTCPeerConnection_ { iceServers : (encodeJson <$> i.iceServers) }
 
-foreign import addStream
-  :: forall e. MediaStream -> RTCPeerConnection -> Eff e Unit
-
 -- | Foreign type for [RTCPeerConnectionIceEvent](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnectionIceEvent)
 foreign import data IceEvent :: *
 
