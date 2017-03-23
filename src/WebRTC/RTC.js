@@ -16,16 +16,6 @@ exports.onicecandidate = function(f) {
     };
 };
 
-exports.onaddstream = function(f) {
-    return function(pc) {
-        return function() {
-            pc.onaddstream = function(event) {
-                f(event)();
-            };
-        };
-    };
-};
-
 exports._createOffer = function(success) {
     return function(error) {
         return function(options) {

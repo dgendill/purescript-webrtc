@@ -3,14 +3,11 @@ module WebRTC.RTC (
 , RTCSessionDescription(..)
 , Ice(..)
 , IceEvent(..)
-, MediaStreamEvent(..)
 , RTCIceCandidate(..)
 , RTCDataChannel(..)
 , ServerType(..)
 , newRTCPeerConnection
-, addStream
 , onicecandidate
-, onaddstream
 , createOffer
 , createAnswer
 , setLocalDescription
@@ -116,12 +113,6 @@ foreign import onicecandidate
                RTCPeerConnection ->
                Eff e Unit
 
-type MediaStreamEvent = { stream :: MediaStream }
-
-foreign import onaddstream
-  :: forall e. (MediaStreamEvent -> Eff e Unit) ->
-               RTCPeerConnection ->
-               Eff e Unit
 
 type RTCSessionDescription = { sdp :: String, "type" :: String }
 
