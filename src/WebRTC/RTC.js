@@ -166,9 +166,9 @@ exports.ondataChannel = function(c) {
 exports.onmessageChannel = function(f) {
     return function(dc) {
         return function() {
-            dc.onmessage = function(m) {
-                console.log("onmessage", m);
-                f(m)();
+            dc.onmessage = function(e) {
+                //console.log("onmessage", m);
+                f(e.data)();
             };
         };
     };
