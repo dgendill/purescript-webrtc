@@ -6,11 +6,19 @@ exports.newRTCPeerConnection_ = function(ice) {
     };
 };
 
-exports.onicecandidate = function(f) {
-    return function(pc) {
-        return function() {
+exports.onicecandidate = function(pc) {
+    return function(f) {
+        return function(success, error) {
             pc.onicecandidate = function(event) {
-                f(event)();
+                f(event)(function() {}, function() {});
+
+                console.log(event);
+
+                // We have the "end-of-candidate" value,
+                // so we should be done now.
+                if (event.candidate === null) {
+                  success(pc.localDescription);
+                }
             };
         };
     };
@@ -91,14 +99,32 @@ exports._setRemoteDescription = function(success) {
 exports._iceEventCandidate = function(nothing) {
     return function(just) {
         return function(e) {
-            return e.candidate ? just(e.candidate) : nothing;
+            if (!e.candidate) return nothing;
+
+
+            if (e.candidate.candidate == "" || e.candidate.candidate == null) {
+                console.log("is null", e)
+                e.candidate.candidate = nothing;
+            }
+
+            return just(e.candidate);
         };
     };
 };
 
+exports.localDescription_ = function(just) {
+  return function(nothing) {
+    return function(c) {
+      var ld = c.localDescription;
+      return c ? just(c) : nothing;
+    }
+  }
+}
+
 exports.addIceCandidate = function(c) {
     return function(pc) {
         return function() {
+            console.log('adding ice candidate', c);
             pc.addIceCandidate(new RTCIceCandidate(c));
         };
     };
@@ -145,13 +171,16 @@ exports.ondataChannel = function(c) {
   }
 }
 
-exports.onmessageChannel = function(f) {
-    return function(dc) {
-        return function() {
+var listenerCount = 0;
+exports.onmessageChannel = function(dc) {
+    listenerCount++;
+    //return function(dc) {
+        return function(success, error) {
+            var b = listenerCount;
             dc.onmessage = function(e) {
-                //console.log("onmessage", m);
-                f(e.data)();
+                console.log("onmessage", b);
+                success(e.data);
             };
         };
-    };
+    //};
 };
