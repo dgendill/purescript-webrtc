@@ -12,8 +12,6 @@ exports.onicecandidate = function(pc) {
             pc.onicecandidate = function(event) {
                 f(event)(function() {}, function() {});
 
-                console.log(event);
-
                 // We have the "end-of-candidate" value,
                 // so we should be done now.
                 if (event.candidate === null) {
@@ -101,9 +99,7 @@ exports._iceEventCandidate = function(nothing) {
         return function(e) {
             if (!e.candidate) return nothing;
 
-
             if (e.candidate.candidate == "" || e.candidate.candidate == null) {
-                console.log("is null", e)
                 e.candidate.candidate = nothing;
             }
 
@@ -179,7 +175,7 @@ exports.onmessageChannel = function(dc) {
             var b = listenerCount;
             dc.onmessage = function(e) {
                 console.log("onmessage", b);
-                success(e.data);
+                success(e.data)();
             };
         };
     //};
