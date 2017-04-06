@@ -10,7 +10,7 @@
   },
   "scripts": {
     "build": "pulp build --include example --main Example --to example/script.js",
-    "test": "echo 'run `npm run build` in project root and then start local server in `example` folder.'"
+    "test": "echo 'Run `npm run build` in project root and then start local server in `example` folder.'"
   },
   "repository": {
     "type": "git",

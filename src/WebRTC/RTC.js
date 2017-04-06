@@ -167,6 +167,29 @@ exports.ondataChannel = function(c) {
   }
 }
 
+exports.oncloseChannel = function(c) {
+  return function(aff) {
+    return function(success, err) {
+      console.log('adding onclose event.');
+      c.onclose = function(event) {
+        console.log('close!');
+        aff(function() {
+          success();
+        }, function() {
+          err();
+        })
+      }
+    }
+  }
+}
+
+exports.closeConnection = function(pc) {
+  return function(success, err) {
+    pc.close();
+    success()
+  }
+}
+
 var listenerCount = 0;
 exports.onmessageChannel = function(dc) {
     listenerCount++;

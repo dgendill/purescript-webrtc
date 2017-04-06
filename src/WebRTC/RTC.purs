@@ -25,6 +25,8 @@ module WebRTC.RTC (
 , rtcSessionDescriptionType
 , rtcSessionDescriptionSdp
 , localDescription
+, closeConnection
+, oncloseChannel
 ) where
 
 import Control.Alt ((<|>))
@@ -32,11 +34,10 @@ import Control.Monad.Aff (Aff, makeAff)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Exception (Error)
 import Data.Argonaut (class DecodeJson, class EncodeJson, Json, decodeJson, encodeJson, getField, jsonEmptyObject, jsonSingletonObject, (:=), (~>))
-import Data.Argonaut.Core (stringify)
 import Data.Maybe (Maybe(..))
 import Data.NonEmpty (NonEmpty)
 import Data.Nullable (Nullable)
-import Prelude (Unit, bind, pure, unit, ($), (<$>), (>>>))
+import Prelude (Unit, bind, pure, unit, ($), (<$>))
 
 -- | Foreign data type for [RTCPeerConnection](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection).
 foreign import data RTCPeerConnection :: *
@@ -243,6 +244,18 @@ foreign import createDataChannel
   :: forall e. String ->
                RTCPeerConnection ->
                Aff (rtc :: RTC | e) RTCDataChannel
+
+-- | Run a callback when the RTCDataChannel [onclose](https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel/onclose)
+-- | event fires.
+foreign import oncloseChannel
+  :: forall e. RTCDataChannel ->
+               Aff (rtc :: RTC | e) Unit ->
+               Aff (rtc :: RTC | e) Unit
+
+-- | Closes a peer connection. See [close](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/close).
+foreign import closeConnection
+  :: forall e. RTCPeerConnection ->
+               Aff (rtc :: RTC | e) Unit
 
 -- | Send a string of data over a data channel.
 foreign import send
