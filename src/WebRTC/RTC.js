@@ -170,9 +170,7 @@ exports.ondataChannel = function(c) {
 exports.oncloseChannel = function(c) {
   return function(aff) {
     return function(success, err) {
-      console.log('adding onclose event.');
       c.onclose = function(event) {
-        console.log('close!');
         aff(function() {
           success();
         }, function() {
@@ -190,16 +188,14 @@ exports.closeConnection = function(pc) {
   }
 }
 
-var listenerCount = 0;
-exports.onmessageChannel = function(dc) {
-    listenerCount++;
-    //return function(dc) {
-        return function(success, error) {
-            var b = listenerCount;
-            dc.onmessage = function(e) {
-                console.log("onmessage", b);
-                success(e.data)();
-            };
+exports.onmessageChannelOnce = function(dc) {
+    return function(success, error) {
+        var ran = false;
+        dc.onmessage = function(e) {
+            if (!ran) {
+              ran = true;
+              success(e.data);
+            }
         };
-    //};
+    };
 };

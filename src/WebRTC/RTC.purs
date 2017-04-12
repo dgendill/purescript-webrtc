@@ -18,7 +18,7 @@ module WebRTC.RTC (
 , addIceCandidate
 , createDataChannel
 , send
-, onmessageChannel
+, onmessageChannelOnce
 , ondataChannel
 , audioVideoRTCOffer
 , noMediaRTCOffer
@@ -263,8 +263,9 @@ foreign import send
                RTCDataChannel ->
                Eff (rtc :: RTC | e) Unit
 
--- | Register a listener on a data channel.
-foreign import onmessageChannel
+-- | Register a listener on a data channel and trigger the callback
+-- | only once.
+foreign import onmessageChannelOnce
   :: forall e. RTCDataChannel ->
                Aff (rtc :: RTC | e) String
 
