@@ -82,7 +82,9 @@ exports._setRemoteDescription = function(success) {
             return function(pc) {
                 return function() {
                     pc.setRemoteDescription(
-                        desc,
+                        // Older version of FF reuire an actual
+                        // RTCSessionDescription object.
+                        new RTCSessionDescription(desc),
                         success,
                         function(e) {
                             error(e)();
@@ -170,8 +172,11 @@ exports.ondataChannel = function(c) {
 exports.oncloseChannel = function(c) {
   return function(aff) {
     return function(success, err) {
+      console.log('adding onclose event.');
       c.onclose = function(event) {
+        console.log('close!');
         aff(function() {
+          console.log('calling success function');
           success();
         }, function() {
           err();
@@ -192,6 +197,7 @@ exports.onmessageChannelOnce = function(dc) {
     return function(success, error) {
         var ran = false;
         dc.onmessage = function(e) {
+            console.log("onmessage");
             if (!ran) {
               ran = true;
               success(e.data);
