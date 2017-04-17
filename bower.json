@@ -1,0 +1,27 @@
+{
+  "name": "purescript-webrtc",
+  "version": "0.0.0",
+  "authors": [
+    "Brian McKenna <brian@brianmckenna.org>"
+  ],
+  "description": "PureScript WebRTC bindings",
+  "keywords": [
+    "purescript",
+    "webrtc"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "output"
+  ],
+  "dependencies": {
+    "purescript-prelude": "^3.0.0",
+    "purescript-argonaut-codecs": "git://github.com/dgendill/purescript-argonaut-codecs#master",
+    "purescript-aff": "^3.0.0",
+    "purescript-argonaut-core": "^3.1.0",
+    "purescript-argonaut-traversals": "^3.1.0",
+    "purescript-nullable": "^3.0.0"
+  }
+}

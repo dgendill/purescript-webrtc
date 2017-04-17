@@ -1,0 +1,25 @@
+{
+  "name": "purescript-webrtc",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "example": "example"
+  },
+  "scripts": {
+    "build": "pulp build --include example --main Example --to example/script.js",
+    "test": "echo 'Run `npm run build` in project root and then start local server in `example` folder.'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/puffnfresh/purescript-webrtc.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/puffnfresh/purescript-webrtc/issues"
+  },
+  "homepage": "https://github.com/puffnfresh/purescript-webrtc#readme"
+}
