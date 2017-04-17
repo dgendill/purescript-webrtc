@@ -203,6 +203,23 @@ createDataChannel :: forall e. String -> RTCPeerConnection -> Aff (rtc :: RTC | 
 
 Create a data channel for connection. See [createDataChannel](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/createDataChannel)
 
+#### `oncloseChannel`
+
+``` purescript
+oncloseChannel :: forall e. RTCDataChannel -> Aff (rtc :: RTC | e) Unit -> Aff (rtc :: RTC | e) Unit
+```
+
+Run a callback when the RTCDataChannel [onclose](https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel/onclose)
+event fires.
+
+#### `closeConnection`
+
+``` purescript
+closeConnection :: forall e. RTCPeerConnection -> Aff (rtc :: RTC | e) Unit
+```
+
+Closes a peer connection. See [close](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/close).
+
 #### `send`
 
 ``` purescript
@@ -211,13 +228,14 @@ send :: forall e. String -> RTCDataChannel -> Eff (rtc :: RTC | e) Unit
 
 Send a string of data over a data channel.
 
-#### `onmessageChannel`
+#### `onmessageChannelOnce`
 
 ``` purescript
-onmessageChannel :: forall e. RTCDataChannel -> Aff (rtc :: RTC | e) String
+onmessageChannelOnce :: forall e. RTCDataChannel -> Aff (rtc :: RTC | e) String
 ```
 
-Register a listener on a data channel.
+Register a listener on a data channel and trigger the callback
+only once.
 
 #### `ondataChannel`
 
