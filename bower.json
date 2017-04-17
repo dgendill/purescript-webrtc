@@ -18,11 +18,14 @@
   ],
   "dependencies": {
     "purescript-prelude": "^2.5.0",
-    "purescript-argonaut-codecs": "dgendill/purescript-argonaut-codecs#master",
+    "purescript-argonaut-codecs": "git://github.com/dgendill/purescript-argonaut-codecs#q",
     "purescript-aff": "^2.0.3",
     "purescript-argonaut-core": "^2.0.1",
     "purescript-argonaut-traversals": "^2.0.1",
     "purescript-argonaut": "^2.0.0",
     "purescript-nullable": "^2.0.0"
+  },
+  "resolutions": {
+    "purescript-argonaut-codecs": "q"
   }
 }
